@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import ModelSerializer, ValidationError, Serializer, CharField
 from .models import Post, Tag, Category
 
 
@@ -32,4 +32,4 @@ class PostListSerializer(ModelSerializer):
         model = Post
         fields = ['title', 'author']
 
- 
+
