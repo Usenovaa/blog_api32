@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, ValidationError, Serializer, CharField
+from rest_framework.serializers import ModelSerializer, ValidationError, ReadOnlyField
 from .models import Post, Tag, Category
 
 
@@ -15,6 +15,8 @@ class CategorySerializer(ModelSerializer):
 
 
 class PostSerializer(ModelSerializer):
+    author = ReadOnlyField(source='author.name')
+
     class Meta:
         model = Post
         fields = '__all__'
@@ -25,6 +27,24 @@ class PostSerializer(ModelSerializer):
                 'Заголовок не должен повторяться'
             )
         return title
+    
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     # representation['test'] = 'test' 
+    #     # representation['tags'] = instance.tags.all().count()  
+    #     return representation 
+        # return {'test': 'hello'}
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        # print('================')
+        # print(user)
+        # print('================')
+        tags = validated_data.pop('tags', [])
+        post = Post.objects.create(author=user, **validated_data)
+        post.tags.add(tags)
+        return post
 
 
 class PostListSerializer(ModelSerializer):
