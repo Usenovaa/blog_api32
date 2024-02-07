@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import CursorPagination
+from rest_framework.decorators import action
+from review.models import Like
+
 
 
 class TagView(generics.ListCreateAPIView):
@@ -35,6 +38,23 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return PostListSerializer
         return self.serializer_class
+    
+    @action(methods=['POST'], detail=True)
+    def like(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        try:
+            like = Like.objects.get(post=post, author=user)
+            like.delete()
+            message = 'disliked'
+        except Like.DoesNotExist:
+            like = Like.objects.create(post=post, author=user)
+            message = 'liked'
+        return Response(message, status=200)
+
+
+
+
     
 
 # class PostView(APIView):

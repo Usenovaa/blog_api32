@@ -27,6 +27,21 @@ class RatingSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         rating = Rating.objects.create(author=user, **validated_data)
         return rating
+    
+    def validate_rating(self, rating):
+        if not rating in range(1, 11):
+            raise serializers.ValidationError(
+                'Рейтинг должен быть от 1 до 10'
+            )
+        return rating
+    
+    def validate_post(self, post):
+        user = self.context.get('request').user 
+        if self.Meta.model.objects.filter(post=post, author=user).exists():
+            raise serializers.ValidationError(
+                'вы уже оставили отзыв на данный продукт'
+            )
+        return post
 
 
     
