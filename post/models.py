@@ -33,7 +33,7 @@ class Tag(models.Model):
 
 
 class Post(models.Model):
-    slug = models.SlugField(max_length=100, primary_key=True, blank=True)
+    slug = models.SlugField(max_length=100, primary_key=True, blank=True, unique=True)
     title = models.CharField(max_length=100, verbose_name='Заголовок')
     body = models.TextField(verbose_name='Содержимое')
     image = models.ImageField(upload_to='posts_img/', blank=True, verbose_name='Картинка')

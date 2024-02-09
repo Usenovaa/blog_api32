@@ -28,23 +28,25 @@ class CustomCursorPagination(CursorPagination):
     ordering = '-created_at'  
 
 
+
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['category', 'tags', 'title']
     search_fields = ['title', 'body']
+    lookup_field = 'pk'
     # ordering_fields = ['title']
     pagination_class = CustomCursorPagination
 
     def get_permissions(self):
         if self.action in ['list', 'retrive']:
-            permissions = [AllowAny]
+            self.permission_classes = [AllowAny]
         elif self.action == 'create':
-            permissions = [IsAuthenticated]
+            self.permission_classes = [IsAuthenticated]
         elif self.action in ['update', 'partial_update', 'destroy']:
-            permissions = [IsAuthorPermission]
-        return [permission() for permission in permissions]
+            self.permission_classes = [IsAuthorPermission]
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action == 'list':
